@@ -28,4 +28,37 @@
 <!-- TODO: Remove or change this placeholder text -->
     <string name="about_text">This application gets book information from a Google API. All titles, cover images, and author information come from there.
     The original version of this app was built by Sascha Jaschke, and a modified version is given to students in the Udacity Android Nanodegree program. </string>
+
+    <!-- Book Service -->
+    <string name="fetch_book" translatable="false">it.jaschke.alexandria.services.action.FETCH_BOOK</string>
+    <string name="delete_book" translatable="false">it.jaschke.alexandria.services.action.DELETE_BOOK</string>
+    <string name="ean" translatable="false">it.jaschke.alexandria.services.extra.EAN</string>
+    <string name="forecast_base_url" translatable="false">https://www.googleapis.com/books/v1/volumes?</string>
+    <string name="query_param" translatable="false">q</string>
+    <string name="isbn" translatable="false">isbn:</string>
+    <string name="get" translatable="false">GET</string>
+    <string name="generic_error" translatable="false">Error </string>
+    <string name="stream_error" translatable="false">Error closing stream </string>
+    <string name="items" translatable="false">items</string>
+    <string name="volume_info" translatable="false">volumeInfo</string>
+    <string name="title" translatable="false">title</string>
+    <string name="subtitle" translatable="false">subtitle</string>
+    <string name="authors" translatable="false">authors</string>
+    <string name="description" translatable="false">description</string>
+    <string name="categories" translatable="false">categories</string>
+    <string name="image_url_path" translatable="false">imageLinks</string>
+    <string name="thumbnail" translatable="false">thumbnail</string>
+
+    <string name="ean_key" translatable="false">EAN</string>
+    <string name="text_content_type" translatable="false">text/plain</string>
+
+    <string name="message_event" translatable="false">MESSAGE_EVENT</string>
+    <string name="message_key" translatable="false">MESSAGE_EXTRA</string>
+    <string name="book_detail" translatable="false">Book Detail</string>
+
+    <string name="drawer_callback_required" translatable="false">Activity must implement NavigationDrawerCallbacks.</string>
+    <string name="pref_start_fragment" translatable="false">pref_startFragment</string>
+    <string name="pref_drawer_learned" translatable="false">navigation_drawer_learned</string>
+    <string name="selected_drawer_pos" translatable="false">selected_navigation_drawer_position</string>
+
 </resources>

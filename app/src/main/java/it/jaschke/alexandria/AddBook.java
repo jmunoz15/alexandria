@@ -26,21 +26,11 @@ import it.jaschke.alexandria.services.DownloadImage;
 
 
 public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-    private static final String TAG = "INTENT_TO_SCAN_ACTIVITY";
     private EditText ean;
     private final int LOADER_ID = 1;
     private View rootView;
     private final String EAN_CONTENT="eanContent";
-    private static final String SCAN_FORMAT = "scanFormat";
-    private static final String SCAN_CONTENTS = "scanContents";
 
-    private String mScanFormat = "Format:";
-    private String mScanContents = "Contents:";
-
-
-
-    public AddBook(){
-    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -80,8 +70,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 }
                 //Once we have an ISBN, start a book intent
                 Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, ean);
-                bookIntent.setAction(BookService.FETCH_BOOK);
+                bookIntent.putExtra(getString(R.string.ean), ean);
+                bookIntent.setAction(getString(R.string.fetch_book));
                 getActivity().startService(bookIntent);
                 AddBook.this.restartLoader();
             }
@@ -117,8 +107,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             @Override
             public void onClick(View view) {
                 Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, ean.getText().toString());
-                bookIntent.setAction(BookService.DELETE_BOOK);
+                bookIntent.putExtra(getString(R.string.ean), ean.getText().toString());
+                bookIntent.setAction(getString(R.string.delete_book));
                 getActivity().startService(bookIntent);
                 ean.setText("");
             }

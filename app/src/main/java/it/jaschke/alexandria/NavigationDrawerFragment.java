@@ -30,17 +30,6 @@ import android.widget.ListView;
 public class NavigationDrawerFragment extends Fragment {
 
     /**
-     * Remember the position of the selected item.
-     */
-    private static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";
-
-    /**
-     * Per the design guidelines, you should show the drawer on launch until the user manually
-     * expands it. This shared preference tracks this.
-     */
-    private static final String PREF_USER_LEARNED_DRAWER = "navigation_drawer_learned";
-
-    /**
      * A pointer to the current callbacks instance (the Activity).
      */
     private NavigationDrawerCallbacks mCallbacks;
@@ -68,16 +57,16 @@ public class NavigationDrawerFragment extends Fragment {
         // Read in the flag indicating whether or not the user has demonstrated awareness of the
         // drawer. See PREF_USER_LEARNED_DRAWER for details.
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        mUserLearnedDrawer = sp.getBoolean(PREF_USER_LEARNED_DRAWER, false);
+        mUserLearnedDrawer = sp.getBoolean(getString(R.string.pref_drawer_learned), false);
 
 
 
         if (savedInstanceState != null) {
-            mCurrentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
+            mCurrentSelectedPosition = savedInstanceState.getInt(getString(R.string.selected_drawer_pos));
             mFromSavedInstanceState = true;
         }else{
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            mCurrentSelectedPosition = Integer.parseInt(prefs.getString("pref_startFragment","0"));
+            mCurrentSelectedPosition = Integer.parseInt(prefs.getString(getString(R.string.pref_start_fragment),"0"));
             selectItem(mCurrentSelectedPosition);
         }
 
@@ -169,7 +158,7 @@ public class NavigationDrawerFragment extends Fragment {
                     mUserLearnedDrawer = true;
                     SharedPreferences sp = PreferenceManager
                             .getDefaultSharedPreferences(getActivity());
-                    sp.edit().putBoolean(PREF_USER_LEARNED_DRAWER, true).apply();
+                    sp.edit().putBoolean(getString(R.string.pref_drawer_learned), true).apply();
                 }
 
                 getActivity().supportInvalidateOptionsMenu(); // calls onPrepareOptionsMenu()
@@ -212,7 +201,7 @@ public class NavigationDrawerFragment extends Fragment {
         try {
             mCallbacks = (NavigationDrawerCallbacks) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException("Activity must implement NavigationDrawerCallbacks.");
+            throw new ClassCastException(getString(R.string.drawer_callback_required));
         }
     }
 
@@ -225,7 +214,7 @@ public class NavigationDrawerFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(STATE_SELECTED_POSITION, mCurrentSelectedPosition);
+        outState.putInt(getString(R.string.selected_drawer_pos), mCurrentSelectedPosition);
     }
 
     @Override

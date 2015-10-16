@@ -40,11 +40,6 @@ public class DbHelper extends SQLiteOpenHelper {
                 " FOREIGN KEY (" + AlexandriaContract.CategoryEntry._ID + ") REFERENCES " +
                 AlexandriaContract.BookEntry.TABLE_NAME + " (" + AlexandriaContract.BookEntry._ID + "))";
 
-
-        Log.d("sql-statments",SQL_CREATE_BOOK_TABLE);
-        Log.d("sql-statments",SQL_CREATE_AUTHOR_TABLE);
-        Log.d("sql-statments",SQL_CREATE_CATEGORY_TABLE);
-
         db.execSQL(SQL_CREATE_BOOK_TABLE);
         db.execSQL(SQL_CREATE_AUTHOR_TABLE);
         db.execSQL(SQL_CREATE_CATEGORY_TABLE);
