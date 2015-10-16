@@ -29,14 +29,13 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     private EditText ean;
     private final int LOADER_ID = 1;
     private View rootView;
-    private final String EAN_CONTENT="eanContent";
 
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if(ean!=null) {
-            outState.putString(EAN_CONTENT, ean.getText().toString());
+            outState.putString(getString(R.string.ean_content), ean.getText().toString());
         }
     }
 
@@ -61,8 +60,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             public void afterTextChanged(Editable s) {
                 String ean =s.toString();
                 //catch isbn10 numbers
-                if(ean.length()==10 && !ean.startsWith("978")){
-                    ean="978"+ean;
+                if(ean.length()==10 && !ean.startsWith(getString(R.string.ean_header))){
+                    ean=getString(R.string.ean_header)+ean;
                 }
                 if(ean.length()<13){
                     clearFields();
@@ -115,7 +114,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         });
 
         if(savedInstanceState!=null){
-            ean.setText(savedInstanceState.getString(EAN_CONTENT));
+            ean.setText(savedInstanceState.getString(getString(R.string.ean_content)));
             ean.setHint("");
         }
 
@@ -132,8 +131,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             return null;
         }
         String eanStr= ean.getText().toString();
-        if(eanStr.length()==10 && !eanStr.startsWith("978")){
-            eanStr="978"+eanStr;
+        if(eanStr.length()==10 && !eanStr.startsWith(getString(R.string.ean_header))){
+            eanStr=getString(R.string.ean_header)+eanStr;
         }
         return new CursorLoader(
                 getActivity(),

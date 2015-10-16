@@ -61,4 +61,7 @@
     <string name="pref_drawer_learned" translatable="false">navigation_drawer_learned</string>
     <string name="selected_drawer_pos" translatable="false">selected_navigation_drawer_position</string>
 
+    <string name="ean_content" translatable="false">eanContent</string>
+    <string name="ean_header" translatable="false">978</string>
+
 </resources>
