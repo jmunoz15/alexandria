@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -67,6 +68,7 @@ public class BookService extends IntentService {
      * parameters.
      */
     private void fetchBook(String ean) {
+        int responseCode = -1;
 
         if (ean.length() != ISBN_LENGTH) {
             return;
@@ -103,7 +105,7 @@ public class BookService extends IntentService {
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod(getString(R.string.get));
             urlConnection.connect();
-
+            responseCode = urlConnection.getResponseCode();
             InputStream inputStream = urlConnection.getInputStream();
             StringBuffer buffer = new StringBuffer();
             if (inputStream == null) {
@@ -137,44 +139,49 @@ public class BookService extends IntentService {
 
         }
         try {
-            JSONObject bookJson = new JSONObject(bookJsonString);
-            JSONArray bookArray;
-            if (bookJson.has(getString(R.string.items))) {
-                bookArray = bookJson.getJSONArray(getString(R.string.items));
-            } else {
-                Intent messageIntent = new Intent(getString(R.string.message_event));
-                messageIntent.putExtra(getString(R.string.message_key), getResources().getString(R.string.not_found));
-                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(messageIntent);
+            if(responseCode == HttpURLConnection.HTTP_OK ) {
+                JSONObject bookJson = new JSONObject(bookJsonString);
+                JSONArray bookArray;
+                if (bookJson.has(getString(R.string.items))) {
+                    bookArray = bookJson.getJSONArray(getString(R.string.items));
+                } else {
+                    Intent messageIntent = new Intent(getString(R.string.message_event));
+                    messageIntent.putExtra(getString(R.string.message_key), getResources().getString(R.string.not_found));
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(messageIntent);
+                    return;
+                }
+
+                JSONObject bookInfo = ((JSONObject) bookArray.get(0)).getJSONObject(getString(R.string.volume_info));
+
+                String title = bookInfo.getString(getString(R.string.title));
+
+                String subtitle = "";
+                if (bookInfo.has(getString(R.string.subtitle))) {
+                    subtitle = bookInfo.getString(getString(R.string.subtitle));
+                }
+
+                String desc = "";
+                if (bookInfo.has(getString(R.string.description))) {
+                    desc = bookInfo.getString(getString(R.string.description));
+                }
+
+                String imgUrl = "";
+                if (bookInfo.has(getString(R.string.image_url_path))
+                        && bookInfo.getJSONObject(getString(R.string.image_url_path)).has(getString(R.string.thumbnail))) {
+                    imgUrl = bookInfo.getJSONObject(getString(R.string.image_url_path)).getString(getString(R.string.thumbnail));
+                }
+
+                writeBackBook(ean, title, subtitle, desc, imgUrl);
+
+                if (bookInfo.has(getString(R.string.authors))) {
+                    writeBackAuthors(ean, bookInfo.getJSONArray(getString(R.string.authors)));
+                }
+                if (bookInfo.has(getString(R.string.categories))) {
+                    writeBackCategories(ean, bookInfo.getJSONArray(getString(R.string.categories)));
+                }
+            }
+            else{
                 return;
-            }
-
-            JSONObject bookInfo = ((JSONObject) bookArray.get(0)).getJSONObject(getString(R.string.volume_info));
-
-            String title = bookInfo.getString(getString(R.string.title));
-
-            String subtitle = "";
-            if (bookInfo.has(getString(R.string.subtitle))) {
-                subtitle = bookInfo.getString(getString(R.string.subtitle));
-            }
-
-            String desc = "";
-            if (bookInfo.has(getString(R.string.description))) {
-                desc = bookInfo.getString(getString(R.string.description));
-            }
-
-            String imgUrl = "";
-            if (bookInfo.has(getString(R.string.image_url_path))
-                    && bookInfo.getJSONObject(getString(R.string.image_url_path)).has(getString(R.string.thumbnail))) {
-                imgUrl = bookInfo.getJSONObject(getString(R.string.image_url_path)).getString(getString(R.string.thumbnail));
-            }
-
-            writeBackBook(ean, title, subtitle, desc, imgUrl);
-
-            if (bookInfo.has(getString(R.string.authors))) {
-                writeBackAuthors(ean, bookInfo.getJSONArray(getString(R.string.authors)));
-            }
-            if (bookInfo.has(getString(R.string.categories))) {
-                writeBackCategories(ean, bookInfo.getJSONArray(getString(R.string.categories)));
             }
 
         } catch (JSONException e) {
