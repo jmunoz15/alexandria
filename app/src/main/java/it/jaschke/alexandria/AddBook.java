@@ -27,6 +27,9 @@ import it.jaschke.alexandria.services.BookService;
 
 
 public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private static final int RC_BARCODE_CAPTURE = 0;
+
     private EditText ean;
     private final int LOADER_ID = 1;
     private View rootView;
@@ -86,12 +89,11 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 // Hint: Use a Try/Catch block to handle the Intent dispatch gracefully, if you
                 // are using an external app.
                 //when you're done, remove the toast below.
-                Context context = getActivity();
-                CharSequence text = "This button should let you scan a book for its barcode!";
-                int duration = Toast.LENGTH_SHORT;
+                Intent intent = new Intent(getActivity(), BarcodeCaptureActivity.class);
+                intent.putExtra(BarcodeCaptureActivity.AutoFocus, true);
+                intent.putExtra(BarcodeCaptureActivity.UseFlash, false);
 
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
+                startActivityForResult(intent, RC_BARCODE_CAPTURE);
 
             }
         });
