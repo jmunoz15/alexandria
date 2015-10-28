@@ -1,26 +1,40 @@
 package it.jaschke.alexandria;
 
+import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
+import android.view.Menu;
 import android.view.View;
 import android.widget.Toast;
 
+import it.jaschke.alexandria.api.BookListAdapter;
+import it.jaschke.alexandria.api.BookSearchAdapter;
 import it.jaschke.alexandria.api.Callback;
+import it.jaschke.alexandria.data.AlexandriaContract;
 
 
-public class MainActivity extends AppCompatActivity implements Callback {
+public class MainActivity extends AppCompatActivity implements Callback, LoaderManager.LoaderCallbacks<Cursor>{
+
+    private final int LOADER_ID = 10;
 
     public static boolean IS_TABLET = false;
     private CharSequence title;
     private BroadcastReceiver messageReciever;
+    private BookSearchAdapter mSearchAdapter;
+    private String mSearchText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +58,63 @@ public class MainActivity extends AppCompatActivity implements Callback {
                 .replace(R.id.container, nextFragment)
                 .addToBackStack((String) title)
                 .commit();
+
+        final String selection = AlexandriaContract.BookEntry.TITLE +" =? ";
+        Cursor cursor = getContentResolver().query(
+                AlexandriaContract.BookEntry.CONTENT_URI,
+                null, // leaving "columns" null just returns all the columns.
+                selection, // cols for "where" clause
+                new String[]{"-1"}, // values for "where" clause
+                null  // sort order
+        );
+
+
+        mSearchAdapter = new BookSearchAdapter(this, cursor, 0);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView =
+                (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+        searchView.setSuggestionsAdapter(mSearchAdapter);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mSearchText = newText;
+                MainActivity.this.restartLoader();
+                return false;
+            }
+        });
+        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+            @Override
+            public boolean onSuggestionSelect(int position) {
+                return false;
+            }
+
+            @Override
+            public boolean onSuggestionClick(int position) {
+                Cursor cursor = mSearchAdapter.getCursor();
+                onItemSelected(cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry._ID)));
+
+                return false;
+            }
+        });
+
+
+        return true;
+
+    }
+
 
 
     public void setTitle(int titleId) {
@@ -101,6 +171,49 @@ public class MainActivity extends AppCompatActivity implements Callback {
         super.onBackPressed();
     }
 
+    private void restartLoader(){
+       getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        final String selection = AlexandriaContract.BookEntry.TITLE +" LIKE ? OR " + AlexandriaContract.BookEntry.SUBTITLE + " LIKE ? ";
+
+
+        if(mSearchText.length()>0){
+            mSearchText = "%"+mSearchText+"%";
+            return new CursorLoader(
+                    this,
+                    AlexandriaContract.BookEntry.CONTENT_URI,
+                    null,
+                    selection,
+                    new String[]{mSearchText,mSearchText},
+                    null
+            );
+        }
+
+        final String selectionEmpty = AlexandriaContract.BookEntry.TITLE +" =? ";
+        return new CursorLoader(
+                this,
+                AlexandriaContract.BookEntry.CONTENT_URI,
+                null,
+                selectionEmpty,
+                new String[]{"-1"},
+                null
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mSearchAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
+
     private class MessageReciever extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -109,5 +222,7 @@ public class MainActivity extends AppCompatActivity implements Callback {
             }
         }
     }
+
+
 
 }

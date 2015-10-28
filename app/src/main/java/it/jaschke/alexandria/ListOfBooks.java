@@ -26,7 +26,6 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     private BookListAdapter bookListAdapter;
     private ListView bookList;
     private int position = ListView.INVALID_POSITION;
-    private EditText searchText;
 
     private final int LOADER_ID = 10;
 
@@ -52,15 +51,6 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
 
         bookListAdapter = new BookListAdapter(getActivity(), cursor, 0);
         View rootView = inflater.inflate(R.layout.fragment_list_of_books, container, false);
-        searchText = (EditText) rootView.findViewById(R.id.searchText);
-        rootView.findViewById(R.id.searchButton).setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ListOfBooks.this.restartLoader();
-                    }
-                }
-        );
 
         rootView.findViewById(R.id.add_button).setOnClickListener(new View.OnClickListener(){
 
@@ -95,21 +85,6 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-
-        final String selection = AlexandriaContract.BookEntry.TITLE +" LIKE ? OR " + AlexandriaContract.BookEntry.SUBTITLE + " LIKE ? ";
-        String searchString =searchText.getText().toString();
-
-        if(searchString.length()>0){
-            searchString = "%"+searchString+"%";
-            return new CursorLoader(
-                    getActivity(),
-                    AlexandriaContract.BookEntry.CONTENT_URI,
-                    null,
-                    selection,
-                    new String[]{searchString,searchString},
-                    null
-            );
-        }
 
         return new CursorLoader(
                 getActivity(),
