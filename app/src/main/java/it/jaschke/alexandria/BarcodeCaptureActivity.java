@@ -342,7 +342,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
             if (barcode != null) {
                 Intent data = new Intent();
                 data.putExtra(BarcodeObject, barcode);
-                setResult(CommonStatusCodes.SUCCESS, data);
+                setResult(Activity.RESULT_OK, data);
                 finish();
             }
             else {

@@ -1,6 +1,7 @@
 package it.jaschke.alexandria;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -60,6 +61,15 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
                     }
                 }
         );
+
+        rootView.findViewById(R.id.add_button).setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), AddBookActvity.class);
+                startActivity(intent);
+            }
+        });
 
         bookList = (ListView) rootView.findViewById(R.id.listOfBooks);
         bookList.setAdapter(bookListAdapter);
