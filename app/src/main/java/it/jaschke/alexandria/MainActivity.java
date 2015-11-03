@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity implements Callback, LoaderM
     private BookSearchAdapter mSearchAdapter;
     private String mSearchText;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -139,7 +141,6 @@ public class MainActivity extends AppCompatActivity implements Callback, LoaderM
             fragment.setArguments(args);
             getSupportFragmentManager().beginTransaction()
                     .replace(id, fragment)
-                    .addToBackStack(getString(R.string.book_detail))
                     .commit();
 
         }
