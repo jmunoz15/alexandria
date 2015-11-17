@@ -15,14 +15,6 @@ import it.jaschke.alexandria.data.AlexandriaContract;
 public class BookSearchAdapter extends CursorAdapter {
 
 
-    public static class ViewHolder {
-        public final TextView bookTitle;
-
-        public ViewHolder(View view) {
-            bookTitle = (TextView) view;
-        }
-    }
-
     public BookSearchAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
     }
@@ -46,9 +38,17 @@ public class BookSearchAdapter extends CursorAdapter {
 
     @Override
     public Cursor swapCursor(Cursor newCursor) {
-        if((!this.getCursor().isClosed()) && (!newCursor.isClosed()))
-        return super.swapCursor(newCursor);
+        if ((!this.getCursor().isClosed()) && (!newCursor.isClosed()))
+            return super.swapCursor(newCursor);
         else
             return null;
+    }
+
+    public static class ViewHolder {
+        public final TextView bookTitle;
+
+        public ViewHolder(View view) {
+            bookTitle = (TextView) view;
+        }
     }
 }

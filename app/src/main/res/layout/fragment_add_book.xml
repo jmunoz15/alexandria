@@ -2,16 +2,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="it.jaschke.alexandria.AddBook"
-    android:layout_marginTop="30dp"
     android:layout_marginLeft="10dp"
     android:layout_marginRight="10dp"
-    android:orientation="vertical">
+    android:layout_marginTop="30dp"
+    android:orientation="vertical"
+    tools:context="it.jaschke.alexandria.AddBook">
+
     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
         android:id="@+id/eancontainer"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:weightSum="4">
 
         <android.support.design.widget.TextInputLayout
@@ -21,128 +22,131 @@
             android:layout_weight="4">
 
             <EditText
+                android:id="@+id/ean"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:hint="@string/input_hint"
                 android:inputType="number"
-                android:minEms="@integer/ean_width"
-                android:id="@+id/ean"
-                android:saveEnabled="true"
                 android:maxLength="@integer/ean_size"
                 android:maxLines="1"
-                android:hint="@string/input_hint" />
+                android:minEms="@integer/ean_width"
+                android:saveEnabled="true"
+                android:textColor="@color/text_primary" />
         </android.support.design.widget.TextInputLayout>
 
         <Button
+            android:id="@+id/scan_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
             android:text="@string/scan_button"
-            android:id="@+id/scan_button"
-            android:layout_weight="1" />
+            android:textColor="@color/accent" />
 
     </LinearLayout>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/bookTitle"
-        android:textSize="@dimen/head_line"
-        android:textIsSelectable="true"
-        android:textStyle="bold"
-        android:layout_marginTop="25dp"
-     />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/bookSubTitle"
-        android:layout_marginTop="10dp"
-        android:maxLines="3"
-        android:ellipsize="end"
-       />
 
+    <TextView
+        android:id="@+id/bookTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:textColor="@color/text_primary"
+        android:textIsSelectable="true"
+        android:textSize="@dimen/head_line"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/bookSubTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:ellipsize="end"
+        android:maxLines="3"
+        android:textColor="@color/text_secondary" />
 
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:weightSum="2">
+
         <ImageView
+            android:id="@+id/bookCover"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxWidth="100dp"
-            android:maxHeight="150dp"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:id="@+id/bookCover"
-            android:contentDescription="@string/book_cover"
+            android:layout_weight="1"
             android:adjustViewBounds="true"
-            android:layout_weight="1"/>
+            android:contentDescription="@string/book_cover"
+            android:maxHeight="150dp"
+            android:maxWidth="100dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp" />
+
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
+            android:layout_weight="1"
             android:gravity="right"
-            android:layout_weight="1">
+            android:orientation="vertical">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:id="@+id/authors"
-                android:gravity="end"
-                android:textSize="@dimen/small_fontsize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-               />
-
+                android:gravity="end"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/small_fontsize" />
 
 
             <TextView
+                android:id="@+id/categories"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/categories"
-                android:textSize="@dimen/small_fontsize"
                 android:layout_marginTop="20dp"
-             />
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/small_fontsize" />
 
-            </LinearLayout>
         </LinearLayout>
-
+    </LinearLayout>
 
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="bottom">
+        android:gravity="bottom"
+        android:orientation="vertical">
+
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="50dip"
-           >
+            android:orientation="horizontal">
 
             <Button
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:text="@string/cancel_button"
-                android:layout_weight="1"
-                style="?android:attr/buttonBarButtonStyle"
                 android:id="@+id/delete_button"
-                android:drawableLeft="@drawable/ic_action_discard"
-                android:visibility="invisible"
-                 />
-
-            <Button
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
-                android:text="@string/ok_button"
-                android:visibility="invisible"
                 android:layout_weight="1"
+                android:drawableLeft="@drawable/ic_action_discard"
+                android:text="@string/cancel_button"
+                android:visibility="invisible" />
+
+            <Button
                 android:id="@+id/save_button"
-                android:drawableLeft="@drawable/ic_action_accept"
                 style="?android:attr/buttonBarButtonStyle"
-                android:layout_gravity="bottom" />
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/ic_action_accept"
+                android:text="@string/ok_button"
+                android:visibility="invisible" />
 
         </LinearLayout>
-        </LinearLayout>
+    </LinearLayout>
 
 
 </LinearLayout>

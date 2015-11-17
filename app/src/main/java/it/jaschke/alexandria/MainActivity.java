@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,36 +16,31 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
-import android.view.View;
 import android.widget.Toast;
 
-import it.jaschke.alexandria.api.BookListAdapter;
 import it.jaschke.alexandria.api.BookSearchAdapter;
 import it.jaschke.alexandria.api.Callback;
 import it.jaschke.alexandria.data.AlexandriaContract;
 
 
-public class MainActivity extends AppCompatActivity implements Callback, LoaderManager.LoaderCallbacks<Cursor>{
+public class MainActivity extends AppCompatActivity implements Callback, LoaderManager.LoaderCallbacks<Cursor> {
 
     private final int LOADER_ID = 10;
+    private final int DETAIL_RQ = 0;
 
-    public static boolean IS_TABLET = false;
+    private final String DETAIL_TAG = "Detail";
+
     private CharSequence title;
     private BroadcastReceiver messageReciever;
     private BookSearchAdapter mSearchAdapter;
     private String mSearchText;
-
+    private Fragment nextFragment;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        IS_TABLET = isTablet();
-        if (IS_TABLET) {
-            setContentView(R.layout.activity_main_tablet);
-        } else {
-            setContentView(R.layout.activity_main);
-        }
+        setContentView(R.layout.activity_main);
 
         messageReciever = new MessageReciever();
         IntentFilter filter = new IntentFilter(getString(R.string.message_event));
@@ -54,14 +48,14 @@ public class MainActivity extends AppCompatActivity implements Callback, LoaderM
         title = getTitle();
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        Fragment nextFragment;
+
         nextFragment = new ListOfBooks();
         fragmentManager.beginTransaction()
                 .replace(R.id.container, nextFragment)
                 .addToBackStack((String) title)
                 .commit();
 
-        final String selection = AlexandriaContract.BookEntry.TITLE +" =? ";
+        final String selection = AlexandriaContract.BookEntry.TITLE + " =? ";
         Cursor cursor = getContentResolver().query(
                 AlexandriaContract.BookEntry.CONTENT_URI,
                 null, // leaving "columns" null just returns all the columns.
@@ -70,8 +64,13 @@ public class MainActivity extends AppCompatActivity implements Callback, LoaderM
                 null  // sort order
         );
 
-
         mSearchAdapter = new BookSearchAdapter(this, cursor, 0);
+    }
+
+    public void updateFirstItem(String ean) {
+        if (findViewById(R.id.right_container) != null) {
+            onItemSelected(ean);
+        }
     }
 
     @Override
@@ -118,7 +117,6 @@ public class MainActivity extends AppCompatActivity implements Callback, LoaderM
     }
 
 
-
     public void setTitle(int titleId) {
         title = getString(titleId);
     }
@@ -140,60 +138,39 @@ public class MainActivity extends AppCompatActivity implements Callback, LoaderM
             BookDetail fragment = new BookDetail();
             fragment.setArguments(args);
             getSupportFragmentManager().beginTransaction()
-                    .replace(id, fragment)
+                    .replace(id, fragment, DETAIL_TAG)
                     .commit();
-
-        }
-        else{
+        } else {
             Intent intent = new Intent(this, BookDetailActivity.class);
             intent.putExtras(args);
-            startActivity(intent);
-
+            startActivityForResult(intent, DETAIL_RQ);
         }
 
 
     }
 
-    public void goBack(View view) {
-        getSupportFragmentManager().popBackStack();
-    }
-
-    private boolean isTablet() {
-        return (getApplicationContext().getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK)
-                >= Configuration.SCREENLAYOUT_SIZE_LARGE;
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (getSupportFragmentManager().getBackStackEntryCount() < 2) {
-            finish();
-        }
-        super.onBackPressed();
-    }
-
-    private void restartLoader(){
-       getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
+    private void restartLoader() {
+        getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        final String selection = AlexandriaContract.BookEntry.TITLE +" LIKE ? OR " + AlexandriaContract.BookEntry.SUBTITLE + " LIKE ? ";
+        final String selection = AlexandriaContract.BookEntry.TITLE + " LIKE ? OR " + AlexandriaContract.BookEntry.SUBTITLE + " LIKE ? ";
 
 
-        if(mSearchText.length()>0){
-            mSearchText = "%"+mSearchText+"%";
+        if (mSearchText.length() > 0) {
+            mSearchText = "%" + mSearchText + "%";
             return new CursorLoader(
                     this,
                     AlexandriaContract.BookEntry.CONTENT_URI,
                     null,
                     selection,
-                    new String[]{mSearchText,mSearchText},
+                    new String[]{mSearchText, mSearchText},
                     null
             );
         }
 
-        final String selectionEmpty = AlexandriaContract.BookEntry.TITLE +" =? ";
+        final String selectionEmpty = AlexandriaContract.BookEntry.TITLE + " =? ";
         return new CursorLoader(
                 this,
                 AlexandriaContract.BookEntry.CONTENT_URI,
@@ -214,6 +191,26 @@ public class MainActivity extends AppCompatActivity implements Callback, LoaderM
 
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
+    @Override
+    public void onItemRemoved(String ean) {
+        getContentResolver().delete(AlexandriaContract.BookEntry.buildBookUri(Long.parseLong(ean)), null, null);
+        ((ListOfBooks) nextFragment).restartLoader();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if ((requestCode == DETAIL_RQ) && (resultCode == RESULT_OK)) {
+            getContentResolver().delete(AlexandriaContract.BookEntry.buildBookUri(Long.parseLong(data.getStringExtra(Intent.EXTRA_TEXT))), null, null);
+            ((ListOfBooks) nextFragment).restartLoader();
+        }
+    }
 
     private class MessageReciever extends BroadcastReceiver {
         @Override
@@ -223,7 +220,4 @@ public class MainActivity extends AppCompatActivity implements Callback, LoaderM
             }
         }
     }
-
-
-
 }

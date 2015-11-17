@@ -20,8 +20,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import it.jaschke.alexandria.api.Callback;
 import it.jaschke.alexandria.data.AlexandriaContract;
-import it.jaschke.alexandria.services.BookService;
 
 
 public class BookDetail extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -33,7 +33,7 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
     private ShareActionProvider shareActionProvider;
     private Intent shareIntent;
 
-    public BookDetail(){
+    public BookDetail() {
     }
 
     @Override
@@ -56,11 +56,7 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
         rootView.findViewById(R.id.delete_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(getString(R.string.ean), ean);
-                bookIntent.setAction(getString(R.string.delete_book));
-                getActivity().startService(bookIntent);
-                getActivity().getSupportFragmentManager().popBackStack();
+                ((Callback) getActivity()).onItemRemoved(ean);
             }
         });
         shareIntent = new Intent(Intent.ACTION_SEND);
@@ -107,13 +103,13 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
         ((TextView) rootView.findViewById(R.id.fullBookDesc)).setText(desc);
 
         String authors = data.getString(data.getColumnIndex(AlexandriaContract.AuthorEntry.AUTHOR));
-        if(null != authors) { //Validation added because the first version crashes when authors were not registered.
+        if (null != authors) { //Validation added because the first version crashes when authors were not registered.
             String[] authorsArr = authors.split(",");
             ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
             ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",", "\n"));
         }
         String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
-        if(Patterns.WEB_URL.matcher(imgUrl).matches()){
+        if (Patterns.WEB_URL.matcher(imgUrl).matches()) {
             Glide.with(getActivity()).load(imgUrl).into((ImageView) rootView.findViewById(R.id.fullBookCover));
             rootView.findViewById(R.id.fullBookCover).setVisibility(View.VISIBLE);
         }
@@ -127,11 +123,4 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
 
     }
 
-    @Override
-    public void onPause() {
-        super.onDestroyView();
-        if(MainActivity.IS_TABLET && rootView.findViewById(R.id.right_container)==null){
-            getActivity().getSupportFragmentManager().popBackStack();
-        }
-    }
 }
